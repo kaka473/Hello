@@ -7,9 +7,12 @@
     tools:context=".BallActivity">
 
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="0dp">
 
         <LinearLayout
             android:layout_width="0dp"
@@ -43,8 +46,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="24dp"
-                android:layout_marginRight="24dp"
                 android:layout_marginTop="16dp"
+                android:layout_marginRight="24dp"
                 android:onClick="click"
                 android:text="@string/point3" />
 
@@ -52,8 +55,8 @@
                 android:id="@+id/btn2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
                 android:layout_marginLeft="24dp"
+                android:layout_marginTop="16dp"
                 android:layout_marginRight="24dp"
                 android:onClick="click"
                 android:text="@string/point2" />
@@ -62,8 +65,8 @@
                 android:id="@+id/btn1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
                 android:layout_marginLeft="24dp"
+                android:layout_marginTop="16dp"
                 android:layout_marginRight="24dp"
                 android:onClick="click"
                 android:text="@string/point1" />
@@ -107,8 +110,8 @@
                 android:id="@+id/btnb3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
                 android:layout_marginLeft="24dp"
+                android:layout_marginTop="16dp"
                 android:layout_marginRight="24dp"
                 android:onClick="clickb"
                 android:text="@string/point3" />
@@ -117,8 +120,8 @@
                 android:id="@+id/btnb2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
                 android:layout_marginLeft="24dp"
+                android:layout_marginTop="16dp"
                 android:layout_marginRight="24dp"
                 android:onClick="clickb"
                 android:text="@string/point2" />
@@ -127,12 +130,14 @@
                 android:id="@+id/btnb1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:onClick="clickb"
                 android:layout_marginLeft="24dp"
+                android:layout_marginTop="16dp"
                 android:layout_marginRight="24dp"
+                android:onClick="clickb"
                 android:text="@string/point1" />
+
         </LinearLayout>
+
     </LinearLayout>
 
     <Button
@@ -143,6 +148,8 @@
         android:layout_marginBottom="32dp"
         android:onClick="click"
         android:text="@string/reset"
-        tools:layout_editor_absoluteX="162dp"
-        tools:layout_editor_absoluteY="499dp" />
+        app:layout_constraintBottom_toBottomOf="@+id/linearLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
