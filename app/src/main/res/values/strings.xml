@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Hello</string>
+    <string name="height">height</string>
+    <string name="weight">weight</string>
+    <string name="cal">cal</string>
+    <string name="sug">sug</string>
+    <string name="score" translatable="false">0</string>
+    <string name="point3" translatable="false">+3</string>
+    <string name="point2" translatable="false">+2</string>
+    <string name="point1" translatable="false">+1</string>
+    <string name="teamlabel1" translatable="false">Team A</string>
+    <string name="teamlabel2" translatable="false">Team B</string>
+    <string name="reset">Reset</string>
+</resources>

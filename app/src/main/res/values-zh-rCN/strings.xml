@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">BMI计算器</string>
+    <string name="height">身高</string>
+    <string name="weight">体重</string>
+    <string name="cal">开始计算</string>
+    <string name="sug">您的身体状况：</string>
+    <string name="reset">重置</string>
+</resources>
