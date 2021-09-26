@@ -11,4 +11,11 @@
     <string name="teamlabel1" translatable="false">Team A</string>
     <string name="teamlabel2" translatable="false">Team B</string>
     <string name="reset">Reset</string>
+    <string name="input" translatable="false">input RMB</string>
+    <string name="dollar" translatable="false">DOLLAR</string>
+    <string name="euro" translatable="false">EURO</string>
+    <string name="won" translatable="false">WON</string>
+    <string name="config" translatable="false">CONFIG</string>
+    <string name="save" translatable="false">SAVE</string>
+    <string name="text" translatable="false">Hello</string>
 </resources>
