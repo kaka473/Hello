@@ -1,11 +1,21 @@
 package com.example.hello;
 
+import static java.lang.Thread.*;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.nfc.Tag;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -13,16 +23,52 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class FirstActivity extends AppCompatActivity {
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
-    double result=0;
-    double dollar_rate=0.1547;
-    double euro_rate=0.132;
-    double won_rate=182.4343;
+public class FirstActivity extends AppCompatActivity implements Runnable{
+
+    private static final String TAG ="FirstActivity";
+    float result=0;
+    float dollar_rate= (float) 0.15;
+    float euro_rate= (float) 0.13;
+    float won_rate= (float) 182.43;
+    Handler handler;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_first);
+
+        Thread thread =new Thread(this);
+        thread.start();
+
+        TextView show = findViewById(R.id.result);
+        SharedPreferences sharedPreferences=getSharedPreferences("myrate", Activity.MODE_PRIVATE);
+
+        dollar_rate=sharedPreferences.getFloat("dollar_rate",0.0f);
+        euro_rate=sharedPreferences.getFloat("euro_rate",0.0f);
+        won_rate=sharedPreferences.getFloat("won_rate",0.0f);
+
+       /* handler =new Handler(Looper.myLooper()){
+            @Override
+            public void handleMessage(@NonNull Message msg) {
+                Log.i(TAG,"收到消息");
+                if(msg.what==6){
+                    String str=(String)msg.obj;
+                    Log.i(TAG,"str:"+str);
+                    show.setText(str);
+                }
+                super.handleMessage(msg);
+            }
+        };*/
+
+
     }
     public void click(View btn){
 
@@ -35,7 +81,7 @@ public class FirstActivity extends AppCompatActivity {
                     "输入非法数据", Toast.LENGTH_SHORT).show();
         }
         else {
-            double rmb=Double.parseDouble(input.getText().toString());
+            float rmb=Float.parseFloat(input.getText().toString());
             if(btn.getId()==R.id.btn1){
                 result=rmb*dollar_rate;
             }else if(btn.getId()==R.id.btn2){
@@ -55,15 +101,56 @@ public class FirstActivity extends AppCompatActivity {
         startActivityForResult(config,1001);
 
     }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if(requestCode==1001 &&resultCode==1002)
         {
-            dollar_rate=data.getDoubleExtra("dollar_rate_key2",0.0);
-            euro_rate=data.getDoubleExtra("euro_rate_key2",0.0);
-            won_rate=data.getDoubleExtra("won_rate_key2",0.0);
+            dollar_rate=data.getFloatExtra("dollar_rate_key2",0.0f);
+            euro_rate=data.getFloatExtra("euro_rate_key2",0.0f);
+            won_rate=data.getFloatExtra("won_rate_key2",0.0f);
+
+            SharedPreferences sp=getSharedPreferences("myrate",Activity.MODE_PRIVATE);
+
+            SharedPreferences.Editor editor=sp.edit();
+            editor.putFloat("dollar_rate",dollar_rate);
+            editor.putFloat("euro_rate",euro_rate);
+            editor.putFloat("won_rate",won_rate);
+            editor.apply();
         }
+
         super.onActivityResult(requestCode, resultCode, data);
+    }
+    public void run()
+    {
+        URL url=null;
+        try{
+            url = new URL("http://www.usd-cny.com/bankofchina.htm");
+            HttpURLConnection http=(HttpURLConnection) url.openConnection();
+            InputStream in=http.getInputStream();
+
+            String html=inputStream2String(in);
+            Log.i(TAG,"run:html="+html);
+        }
+        catch(MalformedURLException e)
+        {
+            e.printStackTrace();
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+    private String inputStream2String(InputStream inputStream) throws IOException
+    {
+        final int bufferSize=1024;
+        final char[] buffer=new char[bufferSize];
+        final StringBuilder out =new StringBuilder();
+        Reader in=new InputStreamReader(inputStream,"gb2312");
+        while(true){
+            int rsz=in.read(buffer,0,buffer.length);
+            if(rsz<0) break;
+            out.append(buffer,0,rsz);
+        }
+        return out.toString();
     }
 }
