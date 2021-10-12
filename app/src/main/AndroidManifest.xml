@@ -10,6 +10,7 @@
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.Hello">
+
         <activity
             android:name=".FirstActivity_1"
             android:exported="true">

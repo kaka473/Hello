@@ -23,6 +23,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -30,45 +35,55 @@ import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
-public class FirstActivity extends AppCompatActivity implements Runnable{
+public class FirstActivity extends AppCompatActivity{
 
     private static final String TAG ="FirstActivity";
     float result=0;
-    float dollar_rate= (float) 0.15;
-    float euro_rate= (float) 0.13;
-    float won_rate= (float) 182.43;
+    float dollar_rate,euro_rate,won_rate;
+    long time;
     Handler handler;
+    Timer timer = new Timer();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_first);
+        //Thread thread =new Thread(this);
 
-        Thread thread =new Thread(this);
-        thread.start();
-
-        TextView show = findViewById(R.id.result);
         SharedPreferences sharedPreferences=getSharedPreferences("myrate", Activity.MODE_PRIVATE);
-
         dollar_rate=sharedPreferences.getFloat("dollar_rate",0.0f);
         euro_rate=sharedPreferences.getFloat("euro_rate",0.0f);
         won_rate=sharedPreferences.getFloat("won_rate",0.0f);
-
-       /* handler =new Handler(Looper.myLooper()){
+        time=sharedPreferences.getLong("time",0);
+        handler =new Handler(Looper.myLooper()){
             @Override
             public void handleMessage(@NonNull Message msg) {
                 Log.i(TAG,"收到消息");
                 if(msg.what==6){
-                    String str=(String)msg.obj;
-                    Log.i(TAG,"str:"+str);
-                    show.setText(str);
+                    Bundle bud=(Bundle) msg.obj;
+                    dollar_rate=bud.getFloat("dollar");
+                    euro_rate=bud.getFloat("euro");
+                    won_rate=bud.getFloat("won");
+
+                    SharedPreferences sp=getSharedPreferences("myrate",Activity.MODE_PRIVATE);
+                    SharedPreferences.Editor editor=sp.edit();
+                    editor.putFloat("dollar_rate",dollar_rate);
+                    editor.putFloat("euro_rate",euro_rate);
+                    editor.putFloat("won_rate",won_rate);
+                    editor.apply();
                 }
                 super.handleMessage(msg);
             }
-        };*/
-
-
+        };
+        if(new Date().getTime()-time>86400000) {
+            Log.i(TAG, "onCreate: 周期调用进程");
+           timer.schedule(task,0,86400000);
+        }
     }
     public void click(View btn){
 
@@ -120,26 +135,46 @@ public class FirstActivity extends AppCompatActivity implements Runnable{
 
         super.onActivityResult(requestCode, resultCode, data);
     }
-    public void run()
-    {
-        URL url=null;
-        try{
-            url = new URL("http://www.usd-cny.com/bankofchina.htm");
-            HttpURLConnection http=(HttpURLConnection) url.openConnection();
-            InputStream in=http.getInputStream();
+    TimerTask task= new TimerTask() {
+        public void run () {
+            SharedPreferences sp=getSharedPreferences("myrate",Activity.MODE_PRIVATE);
 
-            String html=inputStream2String(in);
-            Log.i(TAG,"run:html="+html);
+            SharedPreferences.Editor editor=sp.edit();
+            editor.putLong("time",new Date().getTime());
+            Log.i(TAG, "run: renewtime="+new Date().getTime());
+            editor.apply();
+
+            Document doc = null;
+            try {
+                doc = Jsoup.connect("https://usd-cny.com").get();
+                Log.i(TAG, "run: title=" + doc.title());
+                Element firsttable = doc.getElementsByTag("table").first();
+                Elements trs = firsttable.getElementsByTag("tr");
+                trs.remove(0);
+                Bundle bud = new Bundle();
+                Message msg = handler.obtainMessage(6);
+                for (Element tr : trs) {
+                    Elements tds = tr.getElementsByTag("td");
+                    Element td1 = tds.get(0);
+                    Element td2 = tds.get(4);
+                    if ("美元".equals(td1.text())) {
+                        bud.putFloat("dollar", 100 / Float.parseFloat(td2.text()));
+                    } else if ("欧元".equals(td1.text())) {
+                        bud.putFloat("euro", 100 / Float.parseFloat(td2.text()));
+                    } else if ("韩币".equals(td1.text())) {
+                        bud.putFloat("won", 100 / Float.parseFloat(td2.text()));
+                    }
+                }
+                msg.obj = bud;
+                handler.sendMessage(msg);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            Log.i(TAG, "run1: 执行进程");
         }
-        catch(MalformedURLException e)
-        {
-            e.printStackTrace();
-        }
-        catch(IOException e)
-        {
-            e.printStackTrace();
-        }
-    }
+    };
+
     private String inputStream2String(InputStream inputStream) throws IOException
     {
         final int bufferSize=1024;
