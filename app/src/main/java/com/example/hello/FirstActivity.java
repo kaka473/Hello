@@ -39,7 +39,7 @@ import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class FirstActivity extends AppCompatActivity{
+public class FirstActivity extends AppCompatActivity implements Runnable{
 
     private static final String TAG ="FirstActivity";
     float result=0;
@@ -59,7 +59,7 @@ public class FirstActivity extends AppCompatActivity{
         dollar_rate=sharedPreferences.getFloat("dollar_rate",0.0f);
         euro_rate=sharedPreferences.getFloat("euro_rate",0.0f);
         won_rate=sharedPreferences.getFloat("won_rate",0.0f);
-        time=sharedPreferences.getLong("time",0);
+        //time=sharedPreferences.getLong("time",0);
         handler =new Handler(Looper.myLooper()){
             @Override
             public void handleMessage(@NonNull Message msg) {
@@ -80,10 +80,10 @@ public class FirstActivity extends AppCompatActivity{
                 super.handleMessage(msg);
             }
         };
-        if(new Date().getTime()-time>86400000) {
+        /*if(new Date().getTime()-time>86400000) {
             Log.i(TAG, "onCreate: 周期调用进程");
            timer.schedule(task,0,86400000);
-        }
+        }*/
     }
     public void click(View btn){
 
@@ -135,7 +135,7 @@ public class FirstActivity extends AppCompatActivity{
 
         super.onActivityResult(requestCode, resultCode, data);
     }
-    TimerTask task= new TimerTask() {
+    //TimerTask task= new TimerTask() {
         public void run () {
             SharedPreferences sp=getSharedPreferences("myrate",Activity.MODE_PRIVATE);
 
@@ -173,7 +173,7 @@ public class FirstActivity extends AppCompatActivity{
 
             Log.i(TAG, "run1: 执行进程");
         }
-    };
+    //};
 
     private String inputStream2String(InputStream inputStream) throws IOException
     {
